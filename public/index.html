@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinNews AI – Financial News Simplifier</title>
+    <meta name="description" content="AI-powered financial news simplifier that transforms complex market jargon into concise, accessible insights using Groq Llama 3.3 70B and NewsAPI.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                        <polyline points="16 7 22 7 22 13"></polyline>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">FinNews <span class="highlight">AI</span></span>
+                    <span class="brand-tagline">Financial News Simplifier</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div id="system-status" class="status-pill" title="Checking API status...">
+                    <span class="status-dot"></span>
+                    <span id="status-text">Checking System...</span>
+                </div>
+                <a href="/docs" target="_blank" class="nav-link-btn" title="View OpenAPI / Swagger Documentation">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    API Docs
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-wrapper">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">
+                <span class="badge-sparkle">✨</span>
+                <span>Powered by Groq's Llama 3.3 70B & NewsAPI</span>
+            </div>
+            <h1 class="hero-title">
+                Wall Street Jargon, <br>
+                <span class="gradient-text">Translated into Plain English</span>
+            </h1>
+            <p class="hero-subtitle">
+                Don't let complex macroeconomic terms, Federal Reserve statements, and technical market reports slow you down.
+                FinNews AI retrieves real-time financial news and distills it into clear summaries, actionable takeaways, and jargon definitions.
+            </p>
+
+            <!-- Scenario Audience Pills -->
+            <div class="audience-chips">
+                <span class="audience-label">Designed for:</span>
+                <span class="chip">📈 Retail Investors</span>
+                <span class="chip">🎓 Finance Students</span>
+                <span class="chip">💼 Busy Professionals</span>
+                <span class="chip">⚡ Volatility Trackers</span>
+            </div>
+        </section>
+
+        <!-- News Control & Filter Panel -->
+        <section class="control-panel-card">
+            <div class="control-grid">
+                <!-- Category Filters -->
+                <div class="control-group">
+                    <label class="control-label">Filter by Market Topic</label>
+                    <div class="category-pills" id="category-pills">
+                        <button type="button" class="cat-pill active" data-category="">All Finance</button>
+                        <button type="button" class="cat-pill" data-category="Markets">Markets</button>
+                        <button type="button" class="cat-pill" data-category="Economy">Economy & Fed</button>
+                        <button type="button" class="cat-pill" data-category="Tech Stocks">Tech & AI</button>
+                        <button type="button" class="cat-pill" data-category="Commodities">Commodities</button>
+                        <button type="button" class="cat-pill" data-category="Crypto">Crypto</button>
+                    </div>
+                </div>
+
+                <!-- Article Count & Action -->
+                <div class="control-action-group">
+                    <div class="count-selector-wrapper">
+                        <label for="article-count" class="control-label">Articles to Retrieve</label>
+                        <div class="select-wrapper">
+                            <select id="article-count" class="custom-select">
+                                <option value="3">3 Articles</option>
+                                <option value="5" selected>5 Articles (Recommended)</option>
+                                <option value="8">8 Articles</option>
+                                <option value="10">10 Articles</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="fetch-btn" class="fetch-btn" type="button">
+                        <span class="btn-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                <path d="M3 3v5h5"></path>
+                                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                                <path d="M16 16h5v5"></path>
+                            </svg>
+                        </span>
+                        <span class="btn-text">Fetch & Simplify</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Status & Progress Feedback Banner -->
+        <div id="loading-state" class="loading-state hidden">
+            <div class="loading-spinner-ring">
+                <div></div><div></div><div></div><div></div>
+            </div>
+            <div class="loading-details">
+                <h3 id="loading-title">Retrieving Real-Time Financial Articles...</h3>
+                <p id="loading-subtitle">Querying NewsAPI wire and initializing Groq Llama 3.3 70B inference engine.</p>
+            </div>
+        </div>
+
+        <!-- Error Notification Banner -->
+        <div id="error-banner" class="alert-banner error hidden" role="alert">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-body">
+                <h4 id="error-title">Unable to Fetch News</h4>
+                <p id="error-message">An unexpected error occurred while communicating with the server.</p>
+            </div>
+            <button id="error-retry-btn" class="alert-retry-btn">Retry</button>
+        </div>
+
+        <!-- Skeletons Loader Container -->
+        <div id="skeleton-grid" class="articles-grid hidden">
+            <div class="skeleton-card">
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line title"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line title"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line title"></div>
+                <div class="skeleton-box"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section">
+            <div id="results-header" class="results-header hidden">
+                <div class="results-meta">
+                    <h2 class="results-title">Simplified Financial Briefing</h2>
+                    <span id="results-count-badge" class="count-badge">0 Articles</span>
+                </div>
+                <div class="results-mode-badge" id="results-mode-badge">
+                    <span class="mode-icon">⚡</span>
+                    <span id="mode-text">Groq Llama 3.3 70B</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Articles Grid -->
+            <div id="articles-container" class="articles-grid">
+                <!-- Placeholder welcome card before initial fetch -->
+                <div class="empty-state-card" id="initial-empty-state">
+                    <div class="empty-icon">📰</div>
+                    <h3>Ready to Demystify Today's Markets</h3>
+                    <p>Select your topic, choose how many articles you want to process, and click <strong>"Fetch & Simplify"</strong> above to generate real-time AI summaries.</p>
+                    <button class="primary-pill-btn" onclick="document.getElementById('fetch-btn').click()">
+                        Fetch First Briefing
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <p><strong>FinNews AI</strong> – Financial News Simplifier</p>
+                <p class="disclaimer">Educational & demonstration platform. Not financial or investment advice.</p>
+            </div>
+            <div class="footer-right">
+                <span class="tech-stack-tag">FastAPI</span>
+                <span class="tech-stack-tag">Groq Llama 3.3 70B</span>
+                <span class="tech-stack-tag">NewsAPI</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
